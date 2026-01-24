@@ -30,6 +30,11 @@ export type PostResponse = {
     metadata:        Metadata;
 }
 
+export type UploadFileResponse = {
+    file_infos: FileInfo[];
+    client_ids: string[];
+}
+
 export type Metadata = {
     embeds:           Embed[];
     emojis:           Emoji[];
@@ -52,8 +57,7 @@ export type Embed = {
     data: Props;
 }
 
-export type Props = {
-}
+export type Props = object;
 
 export type Emoji = {
     id:         string;
@@ -79,6 +83,8 @@ export type File = {
     height:            number;
     has_preview_image: boolean;
 }
+
+export type FileInfo = File;
 
 export type Priority = {
     priority: '' | 'important' | 'urgent';

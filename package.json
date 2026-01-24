@@ -1,6 +1,6 @@
 {
   "name": "talkbots",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -44,6 +44,7 @@
     "typescript-eslint": "^8.53.1"
   },
   "dependencies": {
-    "axios": "^1.13.2"
+    "axios": "^1.13.2",
+    "form-data": "^4.0.5"
   }
 }

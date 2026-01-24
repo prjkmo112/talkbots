@@ -1,12 +1,20 @@
+import FormData from "form-data";
 import { HttpChatbot, type HttpChatbotConfig, type HttpChatbotResponse } from "../common";
 import * as mmTypes from "./mmtypes";
 
 
 type MmChatbotConfig = HttpChatbotConfig;
 
+type FileUploadConfig = {
+    channel_id: string;
+    filename?: string;
+}
+
 type RequestPostConfig = {
     channel_id: string;
+    root_id?: string;
     priority?: mmTypes.Priority;
+    file_ids?: string[];
 }
 
 type RequestUpdateConfig = {
@@ -17,8 +25,8 @@ type RequestUpdateConfig = {
     props?: string;
 }
 
-
-type MmChatbotResponse = HttpChatbotResponse<mmTypes.PostResponse>;
+type ResponseType = mmTypes.PostResponse | mmTypes.UploadFileResponse;
+type MmChatbotResponse<T extends ResponseType = mmTypes.PostResponse> = HttpChatbotResponse<T>;
 
 export class MmChatbot extends HttpChatbot {
     private apiPrefix: string;
@@ -42,10 +50,62 @@ export class MmChatbot extends HttpChatbot {
             message: msg,
         }
 
-        if (cfg.priority)
-            formdata.metadata = { priority: cfg.priority };
+        if (cfg.priority) formdata.metadata = { priority: cfg.priority };
+        if (cfg.root_id) formdata.root_id = cfg.root_id;
+        if (cfg.file_ids) formdata.file_ids = cfg.file_ids;
 
         return await this.sendPostRequestCommon('post', `/${this.apiPrefix}/posts`, formdata);
+    }
+
+    async uploadFile(file: File | Buffer, cfg: FileUploadConfig): Promise<MmChatbotResponse<mmTypes.UploadFileResponse>> {
+        const result: MmChatbotResponse<mmTypes.UploadFileResponse> = { success: false, httpCode: 0 };
+
+        const formdata = new FormData();
+        formdata.append('files', file, cfg.filename ?? 'file.png');
+        formdata.append('channel_id', cfg.channel_id);
+
+        try {
+            const { status, data } = await this.axiosInst.post<mmTypes.UploadFileResponse>(`/${this.apiPrefix}/files`, formdata, {
+                headers: {
+                    ...formdata.getHeaders(),
+                },
+                maxBodyLength: Infinity,
+            })
+            result.httpCode = status;
+
+            if (status === 200 || status === 201) {
+                result.success = true;
+                result.data = data;
+            }
+        } catch (error) {
+            result.error = (error as Error).message;
+        }
+
+        return result;
+    }
+
+    async sendFile(
+        msg: string, 
+        file: File | Buffer, 
+        cfg: RequestPostConfig & FileUploadConfig
+    ) : Promise<MmChatbotResponse> {
+        const fileResp = await this.uploadFile(file, cfg);
+
+        if (fileResp.success && fileResp.data && fileResp.data.file_infos.length > 0) {
+            const fileIds = fileResp.data.file_infos.map(v => v.id);
+
+            const formCfg: RequestPostConfig = {
+                channel_id: cfg.channel_id,
+                file_ids: fileIds
+            };
+
+            if (cfg.priority) formCfg.priority = cfg.priority;
+            if (cfg.root_id) formCfg.root_id = cfg.root_id;
+
+            return await this.send(msg, formCfg);
+        }
+
+        return { success: false, httpCode: fileResp.httpCode, error: fileResp.error } as MmChatbotResponse;
     }
 
     async update(cfg: RequestUpdateConfig) {

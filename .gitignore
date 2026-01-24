@@ -2,6 +2,9 @@
 !.vscode/launch.json
 .idea/
 
+.github/*
+!.github/workflows/*
+
 node_modules/
 dist/
 
