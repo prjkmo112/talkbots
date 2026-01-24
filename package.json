@@ -1,7 +1,8 @@
 {
   "name": "talkbots",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
+  "homepage": "https://github.com/prjkmo112/talkbots",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,9 +27,14 @@
       "require": "./dist/index.cjs"
     },
     "./mattermost": {
-      "types": "./dist/modules/mattermost/mmChatbot.d.ts",
-      "import": "./dist/modules/mattermost/mmChatbot.js",
-      "require": "./dist/modules/mattermost/mmChatbot.cjs"
+      "types": "./dist/mattermost.d.ts",
+      "import": "./dist/mattermost.js",
+      "require": "./dist/mattermost.cjs"
+    },
+    "./common": {
+      "types": "./dist/common.d.ts",
+      "import": "./dist/common.js",
+      "require": "./dist/common.cjs"
     }
   },
   "devDependencies": {
