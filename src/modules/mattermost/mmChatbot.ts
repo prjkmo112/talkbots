@@ -3,21 +3,21 @@ import { HttpChatbot, type HttpChatbotConfig, type HttpChatbotResponse } from ".
 import * as mmTypes from "./mmtypes";
 
 
-type MmChatbotConfig = HttpChatbotConfig;
+export type MmChatbotConfig = HttpChatbotConfig;
 
-type FileUploadConfig = {
+export type FileUploadConfig = {
     channel_id: string;
     filename?: string;
 }
 
-type RequestPostConfig = {
+export type RequestPostConfig = {
     channel_id: string;
     root_id?: string;
     priority?: mmTypes.Priority;
     file_ids?: string[];
 }
 
-type RequestUpdateConfig = {
+export type RequestUpdateConfig = {
     post_id: string;
     is_pinned?: boolean;
     message?: string;
@@ -25,8 +25,8 @@ type RequestUpdateConfig = {
     props?: string;
 }
 
-type ResponseType = mmTypes.PostResponse | mmTypes.UploadFileResponse;
-type MmChatbotResponse<T extends ResponseType = mmTypes.PostResponse> = HttpChatbotResponse<T>;
+export type ResponseType = mmTypes.PostResponse | mmTypes.UploadFileResponse;
+export type MmChatbotResponse<T extends ResponseType = mmTypes.PostResponse> = HttpChatbotResponse<T>;
 
 export class MmChatbot extends HttpChatbot {
     private apiPrefix: string;
@@ -61,7 +61,7 @@ export class MmChatbot extends HttpChatbot {
         const result: MmChatbotResponse<mmTypes.UploadFileResponse> = { success: false, httpCode: 0 };
 
         const formdata = new FormData();
-        formdata.append('files', file, cfg.filename ?? 'file.png');
+        formdata.append('files', file, cfg.filename || 'file.png');
         formdata.append('channel_id', cfg.channel_id);
 
         try {

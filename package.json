@@ -1,6 +1,6 @@
 {
   "name": "talkbots",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "homepage": "https://github.com/prjkmo112/talkbots",
   "main": "dist/index.cjs",
